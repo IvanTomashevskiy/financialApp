@@ -83,7 +83,6 @@ struct BankAccount: Identifiable, Codable, Equatable {
         try c.encode(userId,   forKey: .userId)
         try c.encode(name,     forKey: .name)
         try c.encode(currency, forKey: .currency)
-        // Просто кодируем Decimal
         try c.encode(balance,  forKey: .balance)
 
         let iso = ISO8601DateFormatter()
