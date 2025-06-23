@@ -11,7 +11,7 @@ struct HistoryView: View {
     }
     
     var body: some View {
-        NavigationStack {
+        
             VStack(alignment: .leading, spacing: 5) {
                 Text("Моя история")
                     .font(.largeTitle)
@@ -21,7 +21,7 @@ struct HistoryView: View {
             }
             .background(Color(.systemGray6))
             .toolbar { trailingToolbar }
-        }
+        
     }
     
     private var mainList: some View {

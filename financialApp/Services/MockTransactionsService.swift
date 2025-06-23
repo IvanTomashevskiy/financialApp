@@ -6,6 +6,15 @@ enum TransactionsServiceError: Error {
 
 final class MockTransactionsService:  ObservableObject {
     
+    let june15 = Calendar.current.date(from: DateComponents(
+        year: 2025,
+        month: 6,
+        day: 15,
+        hour: 12,    // полдень — любой час между 0 и 23
+        minute: 0,
+        second: 0
+    ))!
+    
     @Published private var mockTransactions: [Transaction] = [
         Transaction(
             id: 1,
@@ -42,7 +51,7 @@ final class MockTransactionsService:  ObservableObject {
            accountId: 1,
            categoryId: 3,
            amount: Decimal(10000.00),
-           transactionDate: Date(),
+           transactionDate: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 10, minute: 30))!,
            comment: "Ветеринар",
            createdAt: Date(),
            updatedAt: Date()
@@ -70,9 +79,19 @@ final class MockTransactionsService:  ObservableObject {
         Transaction(
             id: 6,
             accountId: 1,
-            categoryId: 3,
+            categoryId: 4,
             amount: Decimal(100.00),
             transactionDate: Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date(),
+            comment: "Учеба",
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Transaction(
+            id: 7,
+            accountId: 1,
+            categoryId: 4,
+            amount: Decimal(500.00),
+            transactionDate: Calendar.current.date(byAdding: .day, value: -17, to: Date()) ?? Date(),
             comment: "Учеба",
             createdAt: Date(),
             updatedAt: Date()
