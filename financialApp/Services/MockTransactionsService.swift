@@ -1,24 +1,105 @@
 import Foundation
 
-protocol TransactionsServiceProtocol {
-
-    func fetch(start: Date, end: Date) async throws -> [Transaction]
-
-
-    func create(_ transaction: Transaction) async throws -> Transaction
-
-
-    func update(_ transaction: Transaction) async throws -> Transaction
-
-
-    func delete(id: Int) async throws
-}
-
 enum TransactionsServiceError: Error {
     case notFound(id: Int)
 }
 
-final class MockTransactionsService: TransactionsServiceProtocol {
+final class MockTransactionsService:  ObservableObject {
+    
+    let june15 = Calendar.current.date(from: DateComponents(
+        year: 2025,
+        month: 6,
+        day: 15,
+        hour: 12,    // полдень — любой час между 0 и 23
+        minute: 0,
+        second: 0
+    ))!
+    
+    @Published private var mockTransactions: [Transaction] = [
+        Transaction(
+            id: 1,
+            accountId: 1,
+            categoryId: 1,
+            amount: Decimal(10000.00),
+            transactionDate: Date(),
+            comment: "тест",
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+       Transaction(
+           id: 1,
+           accountId: 1,
+           categoryId: 3,
+           amount: Decimal(2000.00),
+           transactionDate: Date(),
+           comment: nil,
+           createdAt: Date(),
+           updatedAt: Date()
+       ),
+       Transaction(
+           id: 2,
+           accountId: 1,
+           categoryId: 5,
+           amount: Decimal(3000.00),
+           transactionDate: Date(),
+           comment: "Кофе",
+           createdAt: Date(),
+           updatedAt: Date()
+       ),
+       Transaction(
+           id: 3,
+           accountId: 1,
+           categoryId: 3,
+           amount: Decimal(10000.00),
+           transactionDate: Calendar.current.date(from: DateComponents(year: 2025, month: 6, day: 15, hour: 10, minute: 30))!,
+           comment: "Ветеринар",
+           createdAt: Date(),
+           updatedAt: Date()
+       ),
+        Transaction(
+            id: 4,
+            accountId: 1,
+            categoryId: 1,
+            amount: Decimal(5000.00),
+            transactionDate: Calendar.current.date(byAdding: .day, value: -2, to: Date()) ?? Date(),
+            comment: "Абонемент",
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Transaction(
+            id: 5,
+            accountId: 1,
+            categoryId: 2,
+            amount: Decimal(1000.00),
+            transactionDate: Calendar.current.date(byAdding: .day, value: -5, to: Date()) ?? Date(),
+            comment: "Танцы",
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Transaction(
+            id: 6,
+            accountId: 1,
+            categoryId: 4,
+            amount: Decimal(100.00),
+            transactionDate: Calendar.current.date(byAdding: .day, value: -14, to: Date()) ?? Date(),
+            comment: "Учеба",
+            createdAt: Date(),
+            updatedAt: Date()
+        ),
+        Transaction(
+            id: 7,
+            accountId: 1,
+            categoryId: 4,
+            amount: Decimal(500.00),
+            transactionDate: Calendar.current.date(byAdding: .day, value: -17, to: Date()) ?? Date(),
+            comment: "Учеба",
+            createdAt: Date(),
+            updatedAt: Date()
+        )
+       
+   ]
+   
+    
     private var transactions: [Transaction]
     private var nextId: Int
 
@@ -27,12 +108,19 @@ final class MockTransactionsService: TransactionsServiceProtocol {
         self.nextId = (initial.map { $0.id }.max() ?? 0) + 1
     }
 
-    func fetch(start: Date, end: Date) async throws -> [Transaction] {
-        return transactions.filter { tx in
-            tx.transactionDate >= start && tx.transactionDate <= end
+    func todayInterval() -> DateInterval {
+        let startOfDay = Calendar.current.startOfDay(for: Date())
+        let endOfDay = Calendar.current.date(byAdding: .day, value: 1, to: startOfDay)!
+        return DateInterval(start: startOfDay, end: endOfDay)
+    }
+    
+    func getTransactionsOfPeriod(interval: DateInterval) async throws -> [Transaction] {
+        
+        return mockTransactions.filter { transaction in
+            interval.contains(transaction.transactionDate)
         }
     }
-
+    
     func create(_ transaction: Transaction) async throws -> Transaction {
         let now = Date()
         let newTx = Transaction(
