@@ -34,6 +34,11 @@ struct CheckView: View {
             .toolbar {
                 toolBarSection
             }
+            .gesture(
+                DragGesture().onChanged { _ in
+                    balanceFieldIsFocused = false
+                }
+            )
         }
         .refreshable {
             await viewModel.loadAccount()
@@ -64,7 +69,6 @@ struct CheckView: View {
     func pasteFromClipboard() {
         if let clipboard = UIPasteboard.general.string {
             
-            // Удаляем все символы, кроме цифр и точки/запятой
             let cleaned = clipboard
                 .filter { "0123456789.,".contains($0) }
                 .replacingOccurrences(of: ",", with: ".")
@@ -127,9 +131,7 @@ struct CheckView: View {
                 }
                 
             }
-            .gesture(DragGesture().onChanged { _ in
-                balanceFieldIsFocused = false
-            })
+
             if isEditing {
                 HStack {
                     Spacer()
