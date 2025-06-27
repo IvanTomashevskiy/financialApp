@@ -6,14 +6,6 @@ enum TransactionsServiceError: Error {
 
 final class MockTransactionsService:  ObservableObject {
     
-    let june15 = Calendar.current.date(from: DateComponents(
-        year: 2025,
-        month: 6,
-        day: 15,
-        hour: 12,    // полдень — любой час между 0 и 23
-        minute: 0,
-        second: 0
-    ))!
     
     @Published private var mockTransactions: [Transaction] = [
         Transaction(

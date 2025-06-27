@@ -17,7 +17,7 @@ struct TabBarView: View {
             CheckView()
                 .tabItem {
                     Image("Checks")
-                    Text("Чеки")
+                    Text("Счет")
                 }
             
             ArticlesView()
