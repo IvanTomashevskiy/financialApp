@@ -14,7 +14,7 @@ profile
 DerivedData
 *.hmap
 *.ipa
-*.xcassets
+
 
 # Build
 build/

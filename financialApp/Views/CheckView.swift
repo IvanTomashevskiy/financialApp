@@ -35,8 +35,10 @@ struct CheckView: View {
                 toolBarSection
             }
             .gesture(
-                DragGesture().onChanged { _ in
-                    balanceFieldIsFocused = false
+                DragGesture().onEnded { value in
+                    if value.translation.height > 0 {
+                        balanceFieldIsFocused = false
+                    }
                 }
             )
         }
