@@ -11,6 +11,12 @@ struct CheckView: View {
     @State private var isCurrencyDialogPresented = false
     @State private var isBalanceHidden = false
     
+    private var formattedBalance: String {
+        let style = FloatingPointFormatStyle<Double>.number
+            .precision(.fractionLength(0...2))
+        let numberString = style.format(balance)
+        return numberString + " " + currencySymbol(for: editingCurrency)
+    }
     
     var body: some View {
         NavigationStack{
@@ -75,10 +81,9 @@ struct CheckView: View {
                 .filter { "0123456789.,".contains($0) }
                 .replacingOccurrences(of: ",", with: ".")
             
-            // Оставляем только одну точку, если их несколько
             var components = cleaned.split(separator: ".")
             let joined: String
-            if components.count > 1 {
+            if components.count > 2 {
                 let whole = components.removeFirst()
                 let decimal = components.joined()
                 joined = "\(whole).\(decimal)"
@@ -103,7 +108,7 @@ struct CheckView: View {
                 Spacer()
                 if isEditing {
                     
-                    TextField("0", value: $balance, format: .number)
+                    TextField("", value: $balance, format: .number)
                         .keyboardType(.decimalPad)
                         .multilineTextAlignment(.trailing)
                         .focused($balanceFieldIsFocused)
@@ -116,10 +121,10 @@ struct CheckView: View {
                     
                 } else {
                     if isBalanceHidden {
-                        Text(balance, format: .currency(code: currencyCode))
+                        Text(formattedBalance)
                             .spoiler(isOn: $isBalanceHidden)
                     } else {
-                        Text(balance, format: .currency(code: currencyCode))
+                        Text(formattedBalance)
                             .transition(.opacity)
                     }
                 }
@@ -133,7 +138,7 @@ struct CheckView: View {
                 }
                 
             }
-
+            
             if isEditing {
                 HStack {
                     Spacer()
