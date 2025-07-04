@@ -31,7 +31,6 @@ struct TransactionsListView: View {
                         Text("Всего")
                         Spacer()
                         Text(viewModel.totalAmountString)
-                            .foregroundColor(.gray)
                         
                     }
                     
@@ -42,12 +41,14 @@ struct TransactionsListView: View {
                             
                             
                             HStack {
-                                Circle()
-                                    .fill(Color.green.opacity(0.25))
-                                    .frame(width: 22, height: 22)
-                                    .overlay(Text(String(category?.emoji ?? "❓"))
-                                        .font(.caption)
-                                    )
+
+                                ZStack{
+                                    Circle()
+                                        .fill(Color.green.opacity(0.25))
+                                        .frame(width: 32, height: 32)
+                                    Text(String(category?.emoji ?? "❓"))
+                                        .font(.system(size: 15))
+                                }
                                 
                                 VStack(alignment: .leading, spacing: 0) {
                                     Text(category?.name ?? "Категория \(String(describing: transaction.categoryId))")
