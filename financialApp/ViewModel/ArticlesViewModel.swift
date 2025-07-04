@@ -3,13 +3,15 @@ import SwiftUI
 @MainActor
 class ArticlesViewModel: ObservableObject {
     @Published var categories: [Category] = []
-
+    
+    @Published var searchText: String = ""
+    
     private let service: CategoriesServiceProtocol
-
+    
     init(service: CategoriesServiceProtocol = MockCategoriesService()) {
         self.service = service
     }
-
+    
     func loadAll() async {
         do {
             categories = try await service.fetchAll()
@@ -18,50 +20,86 @@ class ArticlesViewModel: ObservableObject {
         }
     }
     
-     func fuzzyMatch(_ pattern: String, _ text: String, maxDistance: Int = 2) -> Bool {
-            let pattern = pattern.lowercased()
-            let text = text.lowercased()
-            
-            let m = pattern.count
-            let n = text.count
-            
-            guard m > 0, n > 0 else {
-                return false
-            }
-            
-            let patternChars = Array(pattern)
-            let textChars = Array(text)
-            
-            for offset in 0...(n - m >= 0 ? n - m : 0) {
-                let end = min(offset + m, n)
-                let window = Array(textChars[offset..<end])
-                let distance = levenshtein(patternChars, window)
-                if distance <= maxDistance {
-                    return true
-                }
-            }
-
+    func fuzzyMatch(_ searchPattern: String, _ targetText: String, maxDistance: Int = 2) -> Bool {
+        let patternLowercased = searchPattern.lowercased()
+        let textLowercased    = targetText.lowercased()
+        
+        let patternLength = patternLowercased.count
+        let textLength    = textLowercased.count
+        
+        guard patternLength > 0, textLength > 0 else {
             return false
         }
+        
+        let patternCharacters = Array(patternLowercased)
+        let textCharacters    = Array(textLowercased)
+        
+        // Максимальная стартовая позиция, с которой окно длины patternLength укладывается в текст
+        let maxStartIndex = max(textLength - patternLength, 0)
+        for startIndex in 0...maxStartIndex {
+            let windowEndIndex = min(startIndex + patternLength, textLength)
+            let textWindow     = Array(textCharacters[startIndex..<windowEndIndex])
+            
+            let editDistance = levenshteinDistance(
+                between: patternCharacters,
+                and: textWindow
+            )
+            
+            if editDistance <= maxDistance {
+                return true
+            }
+        }
+        
+        return false
+    }
 
-        private func levenshtein(_ a: [Character], _ b: [Character]) -> Int {
-            let m = a.count
-            let n = b.count
-            var dp = Array(repeating: Array(repeating: 0, count: n + 1), count: m + 1)
-
-            for i in 0...m { dp[i][0] = i }
-            for j in 0...n { dp[0][j] = j }
-
-            for i in 1...m {
-                for j in 1...n {
-                    if a[i - 1] == b[j - 1] {
-                        dp[i][j] = dp[i - 1][j - 1]
-                    } else {
-                        dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
-                    }
+    private func levenshteinDistance(
+        between sourceCharacters: [Character],
+        and   targetCharacters: [Character]
+    ) -> Int {
+        let sourceLength = sourceCharacters.count
+        let targetLength = targetCharacters.count
+        
+        // Матрица расстояний: (sourceLength+1) x (targetLength+1)
+        var distanceMatrix = Array(
+            repeating: Array(repeating: 0, count: targetLength + 1),
+            count: sourceLength + 1
+        )
+        
+        // Инициализация краёв матрицы
+        for sourceIndex in 0...sourceLength {
+            distanceMatrix[sourceIndex][0] = sourceIndex
+        }
+        for targetIndex in 0...targetLength {
+            distanceMatrix[0][targetIndex] = targetIndex
+        }
+        
+        // Заполнение матрицы
+        for sourceIndex in 1...sourceLength {
+            for targetIndex in 1...targetLength {
+                if sourceCharacters[sourceIndex - 1] == targetCharacters[targetIndex - 1] {
+                    distanceMatrix[sourceIndex][targetIndex] = distanceMatrix[sourceIndex - 1][targetIndex - 1]
+                } else {
+                    let deletionDistance     = distanceMatrix[sourceIndex - 1][targetIndex]
+                    let insertionDistance    = distanceMatrix[sourceIndex][targetIndex - 1]
+                    let substitutionDistance = distanceMatrix[sourceIndex - 1][targetIndex - 1]
+                    
+                    distanceMatrix[sourceIndex][targetIndex] =
+                        1 + min(deletionDistance, insertionDistance, substitutionDistance)
                 }
             }
-
-            return dp[m][n]
         }
+        
+        return distanceMatrix[sourceLength][targetLength]
+    }
+    
+    var filteredCategories: [Category] {
+        guard !searchText.isEmpty else {
+            return categories
+        }
+        return categories.filter { category in
+            fuzzyMatch(searchText, category.name)
+        }
+    }
+    
 }

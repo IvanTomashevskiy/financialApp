@@ -1,24 +1,14 @@
 import SwiftUI
 
 struct ArticlesView: View {
-    @State private var searchText = ""
     @StateObject private var viewModel = ArticlesViewModel()
     private var circleColor: Color { Color("AccentColor").opacity(0.15) }
-    
- 
-    
-    private var filteredCategories: [Category] {
-        guard !searchText.isEmpty else { return viewModel.categories }
-        return viewModel.categories.filter { category in
-            viewModel.fuzzyMatch(searchText, category.name)
-        }
-    }
-    
+        
     var body: some View {
         NavigationStack {
             List {
                 Section(header: Text("Статьи")) {
-                    ForEach(filteredCategories) { category in
+                    ForEach( viewModel.filteredCategories) { category in
                         HStack {
                             ZStack {
                                 Circle()
@@ -33,7 +23,7 @@ struct ArticlesView: View {
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            .searchable(text: $searchText, prompt: "Поиск по статьям")
+            .searchable(text: $viewModel.searchText, prompt: "Поиск по статьям")
             .navigationTitle("Мои статьи")
             .task {
                 await viewModel.loadAll()
