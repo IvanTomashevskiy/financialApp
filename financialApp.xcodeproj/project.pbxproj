@@ -227,11 +227,12 @@
 				};
 			};
 			buildConfigurationList = 189EF05E2DF5B9BF00394537 /* Build configuration list for PBXProject "financialApp" */;
-			developmentRegion = en;
+			developmentRegion = ru;
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
 				Base,
+				ru,
 			);
 			mainGroup = 189EF05A2DF5B9BF00394537;
 			minimizedProjectReferenceProxies = 1;

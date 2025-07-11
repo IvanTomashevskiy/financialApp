@@ -1,13 +1,17 @@
 import SwiftUI
 
+
 struct TransactionsListView: View {
     let direction: Direction
-      @StateObject private var viewModel: TransactionsListViewModel
-      
-      init(direction: Direction) {
-          self.direction = direction
-          _viewModel = StateObject(wrappedValue: TransactionsListViewModel(direction: direction))
-      }
+    @StateObject private var viewModel: TransactionsListViewModel
+    
+    @State private var editingTransaction: Transaction?
+    @State private var isPresentingCreate = false
+    
+    init(direction: Direction) {
+        self.direction = direction
+        _viewModel = StateObject(wrappedValue: TransactionsListViewModel(direction: direction))
+    }
     
     var body: some View {
         NavigationStack {
@@ -41,7 +45,7 @@ struct TransactionsListView: View {
                             
                             
                             HStack {
-
+                                
                                 ZStack{
                                     Circle()
                                         .fill(Color.green.opacity(0.25))
@@ -67,14 +71,29 @@ struct TransactionsListView: View {
                                     .foregroundColor(.gray)
                                     .font(.caption)
                             }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                editingTransaction = transaction
+                            }
                         }
+                    }
+                }
+                .sheet(item: $editingTransaction) { tx in
+                    MyTransactionView(
+                        direction: direction,
+                        transaction: tx
+                    )
+                    .onDisappear {
+                        Task { await viewModel.loadData() }
                     }
                 }
                 .listSectionSpacing(10)
                 
                 HStack {
                     Spacer()
-                    NavigationLink(destination: MyTransactions()){
+                    Button {
+                        isPresentingCreate = true
+                    } label: {
                         Image(systemName: "plus")
                             .font(.system(size: 24, weight: .bold))
                             .foregroundColor(.white)
@@ -82,6 +101,10 @@ struct TransactionsListView: View {
                             .background(Color.green)
                             .clipShape(Circle())
                             .shadow(radius: 4)
+                    }
+                    .sheet(isPresented: $isPresentingCreate) {
+                        MyTransactionView(direction: direction)
+                            .onDisappear { Task { await viewModel.loadData() } }
                     }
                     .padding()
                 }
