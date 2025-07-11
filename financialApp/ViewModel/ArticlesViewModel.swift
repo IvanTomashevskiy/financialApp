@@ -1,6 +1,5 @@
 import SwiftUI
 
-@MainActor
 class ArticlesViewModel: ObservableObject {
     @Published var categories: [Category] = []
     
@@ -8,10 +7,12 @@ class ArticlesViewModel: ObservableObject {
     
     private let service: CategoriesServiceProtocol
     
+    @MainActor
     init(service: CategoriesServiceProtocol = MockCategoriesService()) {
         self.service = service
     }
     
+    @MainActor
     func loadAll() async {
         do {
             categories = try await service.fetchAll()
@@ -34,7 +35,6 @@ class ArticlesViewModel: ObservableObject {
         let patternCharacters = Array(patternLowercased)
         let textCharacters    = Array(textLowercased)
         
-        // Максимальная стартовая позиция, с которой окно длины patternLength укладывается в текст
         let maxStartIndex = max(textLength - patternLength, 0)
         for startIndex in 0...maxStartIndex {
             let windowEndIndex = min(startIndex + patternLength, textLength)

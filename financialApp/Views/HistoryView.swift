@@ -11,7 +11,7 @@ struct HistoryView: View {
     }
     
     var body: some View {
-        
+        NavigationStack {
             VStack(alignment: .leading, spacing: 5) {
                 Text("Моя история")
                     .font(.largeTitle)
@@ -21,7 +21,7 @@ struct HistoryView: View {
             }
             .background(Color(.systemGray6))
             .toolbar { trailingToolbar }
-        
+        }
     }
     
     private var mainList: some View {
@@ -37,27 +37,34 @@ struct HistoryView: View {
     
     private var rangeSection: some View {
         Group {
-            
             HStack {
                 Text("Начало")
                 Spacer()
-                DatePicker("", selection: $viewModel.startDate, displayedComponents: .date)
+                DatePicker("",
+                           selection: $viewModel.startDate,
+                           in: ...Date(),            
+                           displayedComponents: .date)
                     .compactStyled()
                     .onChange(of: viewModel.startDate) { _, new in
                         if new > viewModel.endDate {
                             viewModel.endDate = new
                         }
+                        Task { await viewModel.loadTransactions() }
                     }
             }
             HStack {
                 Text("Конец")
                 Spacer()
-                DatePicker("", selection: $viewModel.endDate, displayedComponents: .date)
+                DatePicker("",
+                           selection: $viewModel.endDate,
+                           in: ...Date(),
+                           displayedComponents: .date)
                     .compactStyled()
                     .onChange(of: viewModel.endDate) { _, new in
                         if new < viewModel.startDate {
                             viewModel.startDate = new
                         }
+                        Task { await viewModel.loadTransactions() }
                     }
             }
         }
@@ -130,10 +137,14 @@ struct HistoryView: View {
     
     private var trailingToolbar: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
-            NavigationLink(destination: AnalysView()) {
+            NavigationLink {
+                AnalysisView(transactions: viewModel.transactions, categories: viewModel.categories)
+                    .background(Color(.systemGroupedBackground))
+            } label: {
                 Image(systemName: "document")
-                    .foregroundColor(.blue)
+
             }
+            
         }
     }
 }

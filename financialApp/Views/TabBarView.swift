@@ -4,7 +4,7 @@ struct TabBarView: View {
     init() {
           let appearance = UITabBarAppearance()
           appearance.configureWithOpaqueBackground()
-          appearance.backgroundColor = .white
+        appearance.backgroundColor = .systemBackground
 
           UITabBar.appearance().standardAppearance = appearance
           if #available(iOS 15.0, *) {
