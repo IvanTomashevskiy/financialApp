@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct TabBarView: View {
+
     init() {
           let appearance = UITabBarAppearance()
           appearance.configureWithOpaqueBackground()

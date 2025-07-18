@@ -24,3 +24,5 @@ final class MockCategoriesService: CategoriesServiceProtocol, ObservableObject{
         return all.filter { $0.direction == direction }
     }
 }
+
+

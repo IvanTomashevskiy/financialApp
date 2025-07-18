@@ -11,28 +11,51 @@ struct HistoryView: View {
     }
     
     var body: some View {
-        NavigationStack {
-            VStack(alignment: .leading, spacing: 5) {
-                Text("Моя история")
-                    .font(.largeTitle)
-                    .fontWeight(.bold)
-                    .padding(.horizontal, 20)
-                mainList
+        ZStack {
+            NavigationStack {
+                VStack(alignment: .leading, spacing: 5) {
+                    Text("Моя история")
+                        .font(.largeTitle)
+                        .fontWeight(.bold)
+                        .padding(.horizontal, 20)
+                    
+                    List {
+                        rangeSection
+                        sortSection
+                        sumSection
+                        transactionsSection
+                    }
+                    .listSectionSpacing(0)
+                    .listRowBackground(Color.clear)
+                }
+                .background(Color(.systemGray6))
+                .toolbar { trailingToolbar }
             }
-            .background(Color(.systemGray6))
-            .toolbar { trailingToolbar }
+            
+            if viewModel.isLoading {
+                Color.black.opacity(0.3)
+                    .ignoresSafeArea()
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle())
+                    .tint(Color.gray)
+                    .scaleEffect(1.5)
+            }
         }
-    }
-    
-    private var mainList: some View {
-        List {
-            rangeSection
-            sortSection
-            sumSection
-            transactionsSection
+        .alert(
+            viewModel.errorMessage ?? "",
+            isPresented: Binding(
+                get: { viewModel.errorMessage != nil },
+                set: { if !$0 { viewModel.errorMessage = nil } }
+            )
+        ) {
+            Button("OK", role: .cancel) {
+                viewModel.errorMessage = nil
+            }
         }
-        .listSectionSpacing(0)
-        .listRowBackground(Color.clear)
+        .task {
+            await viewModel.loadCategories()
+            await viewModel.loadTransactions()
+        }
     }
     
     private var rangeSection: some View {
@@ -42,15 +65,15 @@ struct HistoryView: View {
                 Spacer()
                 DatePicker("",
                            selection: $viewModel.startDate,
-                           in: ...Date(),            
+                           in: ...Date(),
                            displayedComponents: .date)
-                    .compactStyled()
-                    .onChange(of: viewModel.startDate) { _, new in
-                        if new > viewModel.endDate {
-                            viewModel.endDate = new
-                        }
-                        Task { await viewModel.loadTransactions() }
+                .compactStyled()
+                .onChange(of: viewModel.startDate) { old, new in
+                    if new > viewModel.endDate {
+                        viewModel.endDate = new
                     }
+                    Task { await viewModel.loadTransactions() }
+                }
             }
             HStack {
                 Text("Конец")
@@ -59,13 +82,13 @@ struct HistoryView: View {
                            selection: $viewModel.endDate,
                            in: ...Date(),
                            displayedComponents: .date)
-                    .compactStyled()
-                    .onChange(of: viewModel.endDate) { _, new in
-                        if new < viewModel.startDate {
-                            viewModel.startDate = new
-                        }
-                        Task { await viewModel.loadTransactions() }
+                .compactStyled()
+                .onChange(of: viewModel.endDate) { old, new in
+                    if new < viewModel.startDate {
+                        viewModel.startDate = new
                     }
+                    Task { await viewModel.loadTransactions() }
+                }
             }
         }
     }
@@ -107,7 +130,7 @@ struct HistoryView: View {
     private func transactionRow(_ transaction: Transaction) -> some View {
         let category = viewModel.categories.first(where: { $0.id == transaction.categoryId })
         let emojiString = category.map { String($0.emoji) } ?? "❓"
-
+        
         HStack {
             Circle()
                 .fill(Color.green.opacity(0.25))
@@ -117,8 +140,9 @@ struct HistoryView: View {
                         .font(.system(size: 12))
                 )
                 .padding(.trailing, 8)
+            
             VStack(alignment: .leading, spacing: 0) {
-                Text(category?.name ?? "Категория \(String(describing: transaction.categoryId))")
+                Text(category?.name ?? "Категория \(transaction.categoryId ?? -1)")
                     .fontWeight(.medium)
                 if let comment = transaction.comment {
                     Text(comment)
@@ -126,7 +150,9 @@ struct HistoryView: View {
                         .foregroundColor(.gray)
                 }
             }
+            
             Spacer()
+            
             Text("\(transaction.amount) ₽")
                 .fontWeight(.medium)
             Image(systemName: "chevron.right")
@@ -138,13 +164,12 @@ struct HistoryView: View {
     private var trailingToolbar: some ToolbarContent {
         ToolbarItem(placement: .navigationBarTrailing) {
             NavigationLink {
-                AnalysisView(transactions: viewModel.transactions, categories: viewModel.categories)
-                    .background(Color(.systemGroupedBackground))
+                AnalysisView(transactions: viewModel.transactions,
+                             categories: viewModel.categories)
+                .background(Color(.systemGroupedBackground))
             } label: {
                 Image(systemName: "document")
-
             }
-            
         }
     }
 }
@@ -153,7 +178,7 @@ private extension DatePicker where Label == Text {
     func compactStyled() -> some View {
         self
             .tint(.black)
-            .datePickerStyle(CompactDatePickerStyle())
+            .datePickerStyle(.compact)
             .labelsHidden()
             .background(
                 RoundedRectangle(cornerRadius: 8)
