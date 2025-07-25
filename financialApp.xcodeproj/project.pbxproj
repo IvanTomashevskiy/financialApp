@@ -6,6 +6,11 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		181B41F02E32376A009C5BC8 /* Lottie in Frameworks */ = {isa = PBXBuildFile; productRef = 181B41EF2E32376A009C5BC8 /* Lottie */; };
+		18E84D6A2E325387000A0C69 /* PieChart in Frameworks */ = {isa = PBXBuildFile; productRef = 18E84D692E325387000A0C69 /* PieChart */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXContainerItemProxy section */
 		185915CE2DF5CFA30090F4BF /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -29,6 +34,19 @@
 			remoteInfo = financialApp;
 		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		1804A6B02E323B2C00572041 /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		185915CA2DF5CFA30090F4BF /* financialAppTests1.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = financialAppTests1.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -67,6 +85,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				18E84D6A2E325387000A0C69 /* PieChart in Frameworks */,
+				181B41F02E32376A009C5BC8 /* Lottie in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -87,12 +107,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		1804A6E82E324E1200572041 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		189EF05A2DF5B9BF00394537 = {
 			isa = PBXGroup;
 			children = (
 				189EF0652DF5B9BF00394537 /* financialApp */,
 				189EF0762DF5B9C000394537 /* financialAppTests */,
 				189EF0802DF5B9C000394537 /* financialAppUITests */,
+				1804A6E82E324E1200572041 /* Frameworks */,
 				189EF0642DF5B9BF00394537 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -138,6 +166,7 @@
 				189EF05F2DF5B9BF00394537 /* Sources */,
 				189EF0602DF5B9BF00394537 /* Frameworks */,
 				189EF0612DF5B9BF00394537 /* Resources */,
+				1804A6B02E323B2C00572041 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -148,6 +177,8 @@
 			);
 			name = financialApp;
 			packageProductDependencies = (
+				181B41EF2E32376A009C5BC8 /* Lottie */,
+				18E84D692E325387000A0C69 /* PieChart */,
 			);
 			productName = financialApp;
 			productReference = 189EF0632DF5B9BF00394537 /* financialApp.app */;
@@ -236,6 +267,10 @@
 			);
 			mainGroup = 189EF05A2DF5B9BF00394537;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				181B41EE2E32376A009C5BC8 /* XCRemoteSwiftPackageReference "lottie-ios" */,
+				18E84D682E325387000A0C69 /* XCLocalSwiftPackageReference "Utilities" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 189EF0642DF5B9BF00394537 /* Products */;
 			projectDirPath = "";
@@ -672,6 +707,36 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		18E84D682E325387000A0C69 /* XCLocalSwiftPackageReference "Utilities" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = Utilities;
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		181B41EE2E32376A009C5BC8 /* XCRemoteSwiftPackageReference "lottie-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/airbnb/lottie-ios";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.5.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		181B41EF2E32376A009C5BC8 /* Lottie */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 181B41EE2E32376A009C5BC8 /* XCRemoteSwiftPackageReference "lottie-ios" */;
+			productName = Lottie;
+		};
+		18E84D692E325387000A0C69 /* PieChart */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = PieChart;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 189EF05B2DF5B9BF00394537 /* Project object */;
 }
